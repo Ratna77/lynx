@@ -1,0 +1,43 @@
+pipeline {
+    agent any  // Run on any available agent
+    environment {
+        // Environment variables can be set here.
+        // For example, you can set GOOGLE_APPLICATION_CREDENTIALS if needed.
+           GOOGLE_APPLICATION_CREDENTIALS = credentials('MyGoogleCredentials')
+    }
+    stages {
+        stage('Checkout Code') {
+            steps {
+                // Clone your repository with the DBT project
+                // In this example, I'm using a placeholder for the repository URL
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/Ratna77/lynx.git']]])
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                // Install any dependencies here. 
+                // For example, you might install DBT via pip.
+                sh 
+                    pip install dbt-bigquery
+
+            }
+        }
+        stage('Run DBT Tests') {
+            steps {
+                // Navigate into your DBT project folder if it's not the root.
+                // Then run the DBT tests.
+                sh '''
+                  cd Lynx
+                  dbt debug  // Optional: to debug any issues with the DBT setup
+                  dbt test
+                '''
+            }
+        }
+    }
+    post {
+        always {
+            // Actions to take after the pipeline has finished.
+            // For example, you might send notifications here.
+        }
+    }
+}
