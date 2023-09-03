@@ -1,36 +1,50 @@
 pipeline {
     agent any  // Run on any available agent
     environment {
-        // Envirddfadsonment variables can be set here.
-        // For example, you can set GOOGLE_APPLICATION_CREDENTIALS if needed.
-           GOOGLE_APPLICATION_CREDENTIALS = credentials('MyGoogleCredentials')
+        GOOGLE_APPLICATION_CREDENTIALS = credentials('MyGoogleCredentials')
     }
     stages {
         stage('Checkout Code') {
             steps {
-                // Clone your repository with the DBT project
-                // In this example, I'm using a placeholder for the repository URL
-                checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/Ratna77/lynx.git']]])
+                checkout([
+                    $class: 'GitSCM', 
+                    branches: [[name: '*/main']], 
+                    doGenerateSubmoduleConfigurations: false, 
+                    extensions: [], 
+                    submoduleCfg: [], 
+                    userRemoteConfigs: [[url: 'https://github.com/Ratna77/lynx.git']]
+                ])
             }
         }
         stage('Install Dependencies') {
             steps {
-                // Install any dependencies here. 
-                // For example, you might install DBT via pip.
-                sh 
-                    pip install dbt-bigquery
-
+                script {
+                    try {
+                        sh '''
+                            pip install dbt-bigquery
+                        '''
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        throw e
+                    }
+                }
             }
         }
         stage('Run DBT Tests') {
             steps {
-                // Navigate into your DBT project folder if it's not the root.
-                // Then run the DBT tests.
-                sh '''
-                  cd Lynx
-                  dbt debug  // Optional: to debug any issues with the DBT setup
-                  dbt test
-                '''
+                script {
+                    try {
+                        sh '''
+                            export GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
+                            cd Lynx  // Navigate to your DBT project folder if it's not the root
+                            dbt debug  // Optional: to debug any issues with the DBT setup
+                            dbt test
+                        '''
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        throw e
+                    }
+                }
             }
         }
     }
