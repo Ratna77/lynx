@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: bigquery # Choose a name that best represents the data source.
+    database: csp-edw
+    schema: csp
+    tables:
+      - name: country
+        columns:
+          - name: string_field_0
+            tests:
+              - not_null

@@ -1,0 +1,10 @@
+lynx:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: csp-edw
+      dataset: csp
+      priority: interactive
+      
