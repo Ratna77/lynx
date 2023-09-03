@@ -1,7 +1,7 @@
 pipeline {
     agent any  // Run on any available agent
     environment {
-        // Environment variables can be set here.
+        // Envirdonment variables can be set here.
         // For example, you can set GOOGLE_APPLICATION_CREDENTIALS if needed.
            GOOGLE_APPLICATION_CREDENTIALS = credentials('MyGoogleCredentials')
     }
